@@ -1,0 +1,10 @@
+[{
+  "_id": {
+    "$oid": "6288f64eee954811f4110df7"
+  },
+  "completed": false,
+  "createdBy": "José Aguirre",
+  "dueDate": "05/23/2022",
+  "sharedWith": "",
+  "taskName": "Clean the house"
+}]
