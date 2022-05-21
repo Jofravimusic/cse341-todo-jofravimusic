@@ -41,19 +41,19 @@
             "schema": {
               "type": "object",
               "properties": {
-                "firstName": {
+                "completed": {
                   "example": "any"
                 },
-                "lastName": {
+                "createdBy": {
                   "example": "any"
                 },
-                "email": {
+                "dueDate": {
                   "example": "any"
                 },
-                "favoriteColor": {
+                "sharedWith": {
                   "example": "any"
                 },
-                "birthday": {
+                "taskName": {
                   "example": "any"
                 }
               }
@@ -105,19 +105,19 @@
             "schema": {
               "type": "object",
               "properties": {
-                "firstName": {
+                "completed": {
                   "example": "any"
                 },
-                "lastName": {
+                "createdBy": {
                   "example": "any"
                 },
-                "email": {
+                "dueDate": {
                   "example": "any"
                 },
-                "favoriteColor": {
+                "sharedWith": {
                   "example": "any"
                 },
-                "birthday": {
+                "taskName": {
                   "example": "any"
                 }
               }
@@ -151,6 +151,13 @@
             "description": "Not Found"
           }
         }
+      }
+    },
+    "/api-docs/": {
+      "get": {
+        "description": "",
+        "parameters": [],
+        "responses": {}
       }
     }
   }
