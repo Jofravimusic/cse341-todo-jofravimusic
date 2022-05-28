@@ -1,5 +1,7 @@
 const routes = require('express').Router();
 const { ObjectId } = require('mongodb');
+const createError = require('http-errors');
+const { userValidation, results } = require('../validation');
 
 const dbconnection = require('../model/dbconnection');
 
@@ -31,7 +33,13 @@ routes.get('/', (req, res) => {
 });
 
 // Create a user
-routes.post('/', (req, res) => {
+routes.post('/', userValidation, (req, res) => {
+  const result = results(req);
+  if (!result.isEmpty()) {
+    const errors = result.array();
+    return res.status(400).json(errors);
+  }
+
   const user = dbconnection.getUsers().insertOne({
     firstName: req.body.firstName,
     lastName: req.body.lastName,
@@ -48,8 +56,14 @@ routes.post('/', (req, res) => {
 });
 
 // Get a user by Id
-routes.get('/:id', (req, res) => {
-  const userId = new ObjectId(req.params.id);
+routes.get('/:id', (req, res, next) => {
+  const passedId = req.params.id;
+  if (!ObjectId.isValid(passedId)) {
+    const error = createError(400, 'Invalid Id provided');
+    return next(error);
+  }
+  const userId = new ObjectId(passedId);
+
   const user = dbconnection.getUsers().findOne({ _id: userId });
 
   user.then((document) => {
