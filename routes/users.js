@@ -56,11 +56,11 @@ routes.post('/', userValidation, (req, res) => {
 });
 
 // Get a user by Id
-routes.get('/:id', (req, res, next) => {
+routes.get('/:id', (req, res) => {
   const passedId = req.params.id;
   if (!ObjectId.isValid(passedId)) {
     const error = createError(400, 'Invalid Id provided');
-    return next(error);
+    throw error;
   }
   const userId = new ObjectId(passedId);
 
