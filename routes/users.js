@@ -60,7 +60,7 @@ routes.get('/:id', (req, res) => {
   const passedId = req.params.id;
   if (!ObjectId.isValid(passedId)) {
     const error = createError(400, 'Invalid Id provided');
-    throw error;
+    return res.status(error.status).send(error);
   }
   const userId = new ObjectId(passedId);
 
@@ -75,8 +75,20 @@ routes.get('/:id', (req, res) => {
 });
 
 // Update a user by Id
-routes.put('/:id', (req, res) => {
-  const userId = new ObjectId(req.params.id);
+routes.put('/:id', userValidation, (req, res) => {
+  const passedId = req.params.id;
+  if (!ObjectId.isValid(passedId)) {
+    const error = createError(400, 'Invalid Id provided');
+    return res.status(error.status).send(error);
+  }
+  const userId = new ObjectId(passedId);
+
+  const result = results(req);
+  if (!result.isEmpty()) {
+    const errors = result.array();
+    return res.status(400).json(errors);
+  }
+
   const user = dbconnection.getUsers().updateOne(
     {
       _id: userId,
@@ -108,7 +120,12 @@ routes.put('/:id', (req, res) => {
 
 // Delete a user by Id
 routes.delete('/:id', (req, res) => {
-  const userId = new ObjectId(req.params.id);
+  const passedId = req.params.id;
+  if (!ObjectId.isValid(passedId)) {
+    const error = createError(400, 'Invalid Id provided');
+    return res.status(error.status).send(error);
+  }
+  const userId = new ObjectId(passedId);
   const user = dbconnection.getUsers().deleteOne({ _id: userId });
 
   user.then((document) => {

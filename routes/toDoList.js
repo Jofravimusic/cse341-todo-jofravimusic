@@ -1,6 +1,7 @@
 const routes = require('express').Router();
 const { ObjectId } = require('mongodb');
-
+const createError = require('http-errors');
+const { taskValidation, results } = require('../validation');
 const dbconnection = require('../model/dbconnection');
 
 routes.use((req, res, next) => {
@@ -31,7 +32,13 @@ routes.get('/', (req, res) => {
 });
 
 // Create a task
-routes.post('/', (req, res) => {
+routes.post('/', taskValidation, (req, res) => {
+  const result = results(req);
+  if (!result.isEmpty()) {
+    const errors = result.array();
+    return res.status(400).json(errors);
+  }
+
   const task = dbconnection.getTasks().insertOne({
     completed: req.body.completed,
     createdBy: req.body.createdBy,
@@ -49,7 +56,12 @@ routes.post('/', (req, res) => {
 
 // Get a task by Id
 routes.get('/:id', (req, res) => {
-  const taskId = new ObjectId(req.params.id);
+  const passedId = req.params.id;
+  if (!ObjectId.isValid(passedId)) {
+    const error = createError(400, 'Invalid Id provided');
+    return res.status(error.status).send(error);
+  }
+  const taskId = new ObjectId(passedId);
   const task = dbconnection.getTasks().findOne({ _id: taskId });
 
   task.then((document) => {
@@ -61,8 +73,20 @@ routes.get('/:id', (req, res) => {
 });
 
 // Update a Contact by Id
-routes.put('/:id', (req, res) => {
-  const taskId = new ObjectId(req.params.id);
+routes.put('/:id', taskValidation, (req, res) => {
+  const passedId = req.params.id;
+  if (!ObjectId.isValid(passedId)) {
+    const error = createError(400, 'Invalid Id provided');
+    return res.status(error.status).send(error);
+  }
+  const taskId = new ObjectId(passedId);
+
+  const result = results(req);
+  if (!result.isEmpty()) {
+    const errors = result.array();
+    return res.status(400).json(errors);
+  }
+
   const task = dbconnection.getTasks().updateOne(
     {
       _id: taskId,
@@ -82,7 +106,7 @@ routes.put('/:id', (req, res) => {
     if (document.matchedCount >= 1) {
       if (document.modifiedCount < 1)
         return res
-          .status(404)
+          .status(400)
           .send('Task could not be updated, nothing was changed');
       res.status(201).json(document);
       console.log(`Task was updated with id: ${req.params.id}`);
@@ -94,7 +118,12 @@ routes.put('/:id', (req, res) => {
 
 // Delete a Contact by Id
 routes.delete('/:id', (req, res) => {
-  const taskId = new ObjectId(req.params.id);
+  const passedId = req.params.id;
+  if (!ObjectId.isValid(passedId)) {
+    const error = createError(400, 'Invalid Id provided');
+    return res.status(error.status).send(error);
+  }
+  const taskId = new ObjectId(passedId);
   const task = dbconnection.getTasks().deleteOne({ _id: taskId });
 
   task.then((document) => {
