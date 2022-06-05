@@ -42,6 +42,7 @@ routes.post('/', taskValidation, (req, res) => {
   const task = dbconnection.getTasks().insertOne({
     completed: req.body.completed,
     createdBy: req.body.createdBy,
+    dateCreated: Date().toString().slice(0, 15),
     dueDate: req.body.dueDate,
     sharedWith: req.body.sharedWith,
     taskName: req.body.taskName,
